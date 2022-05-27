@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\Locations;
-use App\Entity\News;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,6 +20,14 @@ class LocationsController extends AbstractController
     $jsonContent = $JsonSerializer->serializeJson($data);
     return new Response($jsonContent);
 }
+    // existing URLS: '/locations/Europa', '/locations/Nord-Amerika', 'locations/Asien-Pazifik
+    #[Route('/locations/{continent}', name: 'show_locations_byContinent', methods: ['GET', 'HEAD'])]
+    public function showLocationsByContinent($continent, ManagerRegistry $doctrine, JsonSerializer $JsonSerializer): Response
+    {
+        $data = $doctrine->getRepository(Locations::class)->findBy(['continent' => $continent]);
+        $jsonContent = $JsonSerializer->serializeJson($data);
+        return new Response($jsonContent);
+    }
 
     #[Route('/locations/add', name: 'add_location', methods: ['POST', 'HEAD'])]
     public function addLocation(ManagerRegistry $doctrine, Request $request, JsonSerializer $JsonSerializer): Response
@@ -32,12 +39,6 @@ class LocationsController extends AbstractController
         $entityManager->flush();
         return new Response($data);
     }
-    // existing URLS: '/locations/Europa', '/locations/Nord-Amerika', 'locations/Asien-Pazifik
-    #[Route('/locations/{continent}', name: 'show_locations_byContinent', methods: ['GET', 'HEAD'])]
-    public function showLocationsByContinent($continent, ManagerRegistry $doctrine, JsonSerializer $JsonSerializer): Response
-    {
-        $data = $doctrine->getRepository(Locations::class)->findBy(['continent' => $continent]);
-        $jsonContent = $JsonSerializer->serializeJson($data);
-        return new Response($jsonContent);
-    }
+
 }
+
